@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quantum Computing in Three Moves</title>
+<meta name="description" content="A tutorial for anyone: every one of the forty tricks of quantum computing is one of three simple moves on two sliding rings — the setting, the fold, and the turn. With moving pictures of each move.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Inter:wght@400..800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 40'%3E%3Ccircle cx='22' cy='20' r='16' fill='none' stroke='%231F5FD1' stroke-width='5'/%3E%3Ccircle cx='42' cy='20' r='16' fill='none' stroke='%23D92B24' stroke-width='5'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#FFF4D6; --paper:#ffffff; --ink:#111318; --muted:#4B5160; --line:#111318; --body:#23262e;
+    --blue:#1F5FD1; --yellow:#FFC20E; --red:#D92B24; --green:#1E9E5A; --screen:#0f1626; --screen2:#17213b;
+    --set:var(--blue); --fold:var(--yellow); --turn:var(--red);
+    --display:"Bricolage Grotesque","Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;
+    --bw:2.5px; --r:24px; --sh:6px 6px 0 var(--line); --sh-sm:4px 4px 0 var(--line);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:72px}
+  ::selection{background:var(--yellow);color:var(--ink)}
+  body{margin:0;color:var(--body);font-family:var(--sans);font-size:1.0625rem;line-height:1.7;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-feature-settings:"ss01","cv11";
+    background-color:var(--bg);background-size:200px 200px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cg opacity='.2'%3E%3Ccircle cx='34' cy='36' r='16' fill='%23D92B24'/%3E%3Crect x='122' y='20' width='30' height='30' fill='%231F5FD1'/%3E%3Cpolygon points='62,176 84,140 106,176' fill='%23FFC20E'/%3E%3Ccircle cx='166' cy='132' r='11' fill='none' stroke='%23141414' stroke-width='5'/%3E%3Crect x='20' y='110' width='40' height='7' rx='3' fill='%23141414'/%3E%3Cpath d='M128 182 q12 -18 24 0 t24 0' fill='none' stroke='%231F5FD1' stroke-width='5' stroke-linecap='round'/%3E%3Crect x='86' y='76' width='22' height='22' rx='4' transform='rotate(20 97 87)' fill='%23D92B24'/%3E%3Ccircle cx='176' cy='62' r='6' fill='%23FFC20E'/%3E%3C/g%3E%3C/svg%3E");}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+  a{color:var(--blue);text-underline-offset:.18em;text-decoration-thickness:.08em}
+  h1,h2,h3,h4{font-family:var(--display);color:var(--ink);font-weight:800;line-height:1.1;letter-spacing:-.02em;font-optical-sizing:auto}
+  b,strong{color:var(--ink);font-weight:700}
+  h1 em,h2 em,h3 em{font-style:normal;color:var(--blue)}
+  code,.mono{font-family:var(--mono)}
+  :focus-visible{outline:3px solid var(--blue);outline-offset:3px;border-radius:8px}
+
+  /* ---------- nav ---------- */
+  nav.toc{position:sticky;top:0;z-index:30;background:rgba(17,19,24,.96);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px)}
+  nav.toc .bar{position:relative;display:flex;align-items:center;gap:18px;max-width:1240px;margin:0 auto;padding:9px 16px}
+  .brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-family:var(--display);font-weight:800;font-size:1.02rem;letter-spacing:-.01em;white-space:nowrap}
+  .brand svg{width:34px;height:22px;flex:none}
+  nav.toc .links{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+  nav.toc .links::-webkit-scrollbar{display:none}
+  nav.toc .links a{color:#d3d9e6;text-decoration:none;font:600 .8rem/1 var(--sans);padding:9px 11px;border-radius:999px;white-space:nowrap;transition:background .15s,color .15s}
+  nav.toc .links a:hover{color:#fff;background:rgba(255,255,255,.12)}
+  nav.toc .links a.active{color:var(--ink);background:var(--yellow)}
+  .progress{position:absolute;left:0;right:0;bottom:-3px;height:3px;transform-origin:0 50%;transform:scaleX(0);
+    background:linear-gradient(90deg,var(--blue) 0 33.33%,var(--yellow) 33.33% 66.66%,var(--red) 66.66% 100%)}
+
+  /* ---------- hero ---------- */
+  header.hero{padding:36px 16px 20px}
+  .hero .wrap{padding:0 16px}
+  .hero-card{position:relative;overflow:hidden;background:var(--yellow);border:var(--bw) solid var(--line);border-radius:32px;box-shadow:10px 10px 0 var(--line);
+    padding:clamp(28px,5.5vw,72px);display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:clamp(28px,4.5vw,64px);align-items:center}
+  .hero-card::after{content:"";position:absolute;right:-90px;top:-90px;width:260px;height:260px;border-radius:50%;border:26px solid rgba(17,19,24,.07);pointer-events:none}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);color:#fff;background:var(--ink);letter-spacing:.1em;text-transform:uppercase;
+    font-size:.7rem;font-weight:700;margin:0 0 24px;padding:8px 14px 8px 12px;border-radius:999px}
+  .eyebrow .dots{display:inline-flex;gap:4px}
+  .eyebrow .dots i{width:8px;height:8px;border-radius:50%;display:block}
+  .hero h1{font-size:clamp(2.5rem,6vw,4.85rem);line-height:.98;letter-spacing:-.045em;margin:0 0 22px}
+  .hero h1 .grad{color:var(--blue);text-decoration:underline wavy var(--red);text-decoration-thickness:.065em;text-underline-offset:.16em;text-decoration-skip-ink:none}
+  .lede{font-size:clamp(1.08rem,1.9vw,1.28rem);line-height:1.6;color:var(--ink);max-width:56ch;margin:0 0 30px}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 34px}
+  .btn{display:inline-flex;align-items:center;gap:10px;font:700 .98rem/1 var(--sans);text-decoration:none;padding:15px 22px;border-radius:14px;
+    border:var(--bw) solid var(--line);box-shadow:var(--sh-sm);transition:transform .15s,box-shadow .15s}
+  .btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--line)}
+  .btn.primary{background:var(--ink);color:#fff} .btn.ghost{background:#fff;color:var(--ink)}
+  .bignum{display:flex;align-items:stretch;gap:12px;flex-wrap:wrap;margin:0}
+  .bignum>span:not(.arrow){display:flex;align-items:center;gap:12px;background:#fff;border:var(--bw) solid var(--line);border-radius:16px;padding:12px 18px 12px 16px;box-shadow:var(--sh-sm)}
+  .bignum b{font-family:var(--display);font-size:clamp(2.4rem,5vw,3.4rem);font-weight:800;line-height:1;letter-spacing:-.04em}
+  .bignum .from b{color:var(--ink)} .bignum .to b{color:var(--blue)}
+  .bignum .arrow{align-self:center;color:var(--ink);font-size:1.8rem;font-weight:800}
+  .bignum small{display:block;font-family:var(--sans);color:var(--ink);font-size:.86rem;font-weight:700;line-height:1.25;max-width:9ch}
+  .hero-art{margin:0;background:radial-gradient(120% 95% at 50% 0%,#1d2a4a 0%,var(--screen) 62%);border:var(--bw) solid var(--line);border-radius:26px;
+    box-shadow:8px 8px 0 var(--line);padding:18px 18px 16px;position:relative}
+  .hero-art svg{width:100%;display:block;aspect-ratio:1/1}
+  .hero-art figcaption{font:600 .78rem/1.4 var(--mono);color:#c9d2e3;text-align:center;letter-spacing:.06em;text-transform:uppercase;margin-top:6px}
+
+  /* ---------- sections ---------- */
+  section{padding:22px 16px}
+  section>.wrap{background:var(--paper);border:var(--bw) solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:clamp(26px,5vw,64px)}
+  .kicker{max-width:none;display:flex;align-items:center;gap:12px;margin:0 0 18px;font:700 .74rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .kicker .n{display:inline-grid;place-items:center;height:30px;min-width:46px;padding:0 10px;border-radius:999px;background:var(--ink);color:#fff;font-weight:800;letter-spacing:.06em}
+  .kicker .n.set{background:var(--blue)} .kicker .n.fold{background:var(--yellow);color:var(--ink)} .kicker .n.turn{background:var(--red)}
+  .kicker::after{content:"";flex:1;height:2px;background:repeating-linear-gradient(90deg,rgba(17,19,24,.22) 0 6px,transparent 6px 12px)}
+  section h2{font-size:clamp(2rem,4.3vw,3.1rem);line-height:1.03;letter-spacing:-.035em;margin:0 0 12px;max-width:24ch}
+  .sub{font-family:var(--sans);color:var(--muted);font-size:clamp(1.02rem,1.6vw,1.18rem);line-height:1.5;font-weight:500;margin:0 0 30px;max-width:60ch}
+  p{max-width:68ch}
+  h2.mt{display:inline-block;padding:.14em .45em .18em;border:var(--bw) solid var(--line);border-radius:18px;box-shadow:5px 5px 0 var(--line);max-width:none}
+  .mt.set{background:var(--blue);color:#fff} .mt.fold{background:var(--yellow);color:var(--ink)} .mt.turn{background:var(--red);color:#fff}
+  .callout{--c:var(--blue);background:#FFFBEF;border:var(--bw) solid var(--line);border-left:10px solid var(--c);border-radius:16px;
+    padding:18px 22px;margin:24px 0;max-width:70ch;color:var(--ink);box-shadow:var(--sh-sm)}
+  .callout.fold{--c:var(--yellow)} .callout.turn{--c:var(--red)}
+  .chip{display:inline-block;padding:0 9px;border-radius:8px;font-weight:800;border:2px solid var(--line);line-height:1.4;font-size:.94em}
+  .chip.set{background:var(--blue);color:#fff} .chip.fold{background:var(--yellow);color:var(--ink)} .chip.turn{background:var(--red);color:#fff}
+
+  /* three-move cards */
+  .moves{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:8px}
+  .move{position:relative;background:#fff;border:var(--bw) solid var(--line);border-radius:20px;padding:24px 22px 22px;overflow:hidden;
+        box-shadow:var(--sh-sm);text-decoration:none;color:inherit;display:block;transition:transform .15s,box-shadow .15s}
+  .move::before{content:"";position:absolute;inset:0 0 auto 0;height:10px;background:var(--c)}
+  a.move:hover{transform:translate(-3px,-3px);box-shadow:7px 7px 0 var(--line)}
+  .move.set{--c:var(--set)} .move.fold{--c:var(--fold)} .move.turn{--c:var(--turn)}
+  .move .icon{width:76px;height:76px;display:block;margin:6px 0 14px}
+  .move .tag{font:700 .72rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .move h3{margin:6px 0 8px;font-size:1.5rem;letter-spacing:-.03em}
+  .move .one{font-weight:700;margin:0 0 8px;color:var(--ink)}
+  .move p{font-size:.96rem;color:var(--body);margin:0}
+  .move .go{font:700 .8rem/1 var(--mono);color:var(--ink);margin-top:16px;display:inline-block;border-bottom:2px solid var(--c);padding-bottom:4px}
+
+  /* figures + live demos sit on dark "screens" */
+  .fig,.demo{position:relative;background:radial-gradient(120% 90% at 50% 0%,#1b2744 0%,var(--screen) 60%);border:var(--bw) solid var(--line);
+    border-radius:22px;padding:44px 20px 20px;margin:22px 0;box-shadow:var(--sh)}
+  .fig::before,.demo::before{content:"";position:absolute;top:16px;left:18px;width:10px;height:10px;border-radius:50%;background:var(--red);
+    box-shadow:16px 0 0 var(--yellow),32px 0 0 var(--blue)}
+  .fig svg,.demo svg{width:100%;display:block;margin:0 auto}
+  .fig svg text,.demo svg text{font-family:var(--mono)}
+  .fig svg{max-width:520px}
+  .demo{--c:var(--set)} .demo.fold{--c:var(--fold)} .demo.turn{--c:var(--turn)}
+  .demo svg{max-width:500px}
+  .fig figcaption,.demo figcaption{color:#cdd5e4;font-size:.9rem;line-height:1.55;text-align:center;margin:14px auto 0;max-width:60ch;font-family:var(--sans)}
+  .live{position:absolute;top:11px;right:14px;font:800 .66rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;
+        color:#fff;background:var(--c);border-radius:999px;padding:6px 11px}
+  .demo.fold .live{color:var(--ink)}
+  .live::before{content:"● "}
+  .wheelwrap svg{max-width:430px}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start}
+  .split>.copy>p:first-child{margin-top:0}
+  .split>.demo{position:sticky;top:84px;margin:0}
+
+  /* filter + tools */
+  .filter{position:sticky;top:58px;z-index:6;display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0 22px;padding:12px 0;background:#fff;border-bottom:2px solid rgba(17,19,24,.1)}
+  .filter button{cursor:pointer;background:#fff;color:var(--ink);border:var(--bw) solid var(--line);border-radius:999px;padding:9px 16px;
+    font:700 .86rem/1 var(--sans);transition:transform .15s,box-shadow .15s}
+  .filter button:hover{transform:translateY(-2px);box-shadow:0 3px 0 var(--line)}
+  .filter button[data-f="all"].on{background:var(--ink);color:#fff}
+  .filter button[data-f="set"].on{background:var(--blue);color:#fff}
+  .filter button[data-f="fold"].on{background:var(--yellow);color:var(--ink)}
+  .filter button[data-f="turn"].on{background:var(--red);color:#fff}
+  .count{color:var(--muted);font:700 .8rem/1 var(--mono);margin-left:auto}
+  .tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+  .tool{position:relative;display:flex;flex-direction:column;align-items:flex-start;background:#fff;border:var(--bw) solid var(--line);border-radius:18px;
+        padding:24px 18px 18px;overflow:hidden;box-shadow:var(--sh-sm);transition:transform .15s,box-shadow .15s}
+  .tool::before{content:"";position:absolute;inset:0 0 auto 0;height:8px;background:var(--c)}
+  .tool.set{--c:var(--set)} .tool.fold{--c:var(--fold)} .tool.turn{--c:var(--turn)}
+  .tool:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--line)}
+  .tool .idx{position:absolute;top:22px;right:16px;font:700 .74rem/1 var(--mono);color:#5d6372;letter-spacing:.06em}
+  .tool .movetag{display:inline-block;padding:4px 10px;border-radius:999px;border:2px solid var(--line);font:800 .66rem/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+  .tool.set .movetag{background:var(--blue);color:#fff}
+  .tool.fold .movetag{background:var(--yellow);color:var(--ink)}
+  .tool.turn .movetag{background:var(--red);color:#fff}
+  .tool h4{margin:12px 0 8px;font-size:1.22rem;letter-spacing:-.02em;line-height:1.15}
+  .tool .does{font-size:.94rem;color:var(--body);margin:0}
+  .tool .why{display:block;margin:14px 0 16px;padding:12px 14px;background:#FFF7DD;border:2px dashed var(--line);border-radius:12px;color:var(--ink);font-size:.9rem;line-height:1.55}
+  .tool .vlink{margin-top:auto}
+  .hidden{display:none!important}
+
+  ul.clean{max-width:68ch;padding-left:1.2em} ul.clean li{margin:8px 0} ul.clean li::marker{color:var(--red)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  .grid2 .callout{margin:10px 0}
+  /* primer concept cards */
+  .concepts{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin-top:8px}
+  .concept{display:flex;flex-direction:column;align-items:flex-start;background:#fff;border:var(--bw) solid var(--line);border-radius:20px;padding:22px;box-shadow:var(--sh-sm)}
+  .concept .q{display:inline-block;font:800 .68rem/1 var(--mono);color:#fff;background:var(--ink);text-transform:uppercase;letter-spacing:.12em;padding:6px 10px;border-radius:999px;margin:0 0 14px}
+  .concept h3{margin:0 0 10px;font-size:1.32rem;letter-spacing:-.025em}
+  .concept p{font-size:.96rem;color:var(--body);margin:0 0 12px}
+  .concept .ringline{font-size:.93rem;color:#17479e;font-weight:600;margin:0 0 16px;border-left:4px solid var(--blue);padding:2px 0 2px 12px}
+  .concept .ringline b{color:#17479e}
+  .concept .vlink{margin-top:auto}
+  /* video link pill */
+  .vlink{display:inline-flex;align-items:center;gap:8px;font:700 .78rem/1 var(--sans);color:#fff;text-decoration:none;
+    border:2px solid var(--ink);background:var(--ink);border-radius:999px;padding:8px 14px 8px 10px;transition:background .15s,border-color .15s}
+  .vlink:hover{background:var(--red);border-color:var(--red)}
+  .vlink::before{content:"\25B6";display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--yellow);color:var(--ink);font-size:.55rem;padding-left:1px}
+  /* the loop strip */
+  .loopstrip{display:flex;align-items:stretch;gap:12px;flex-wrap:wrap;margin:22px 0}
+  .loopstrip .step{position:relative;flex:1 1 160px;background:#fff;border:var(--bw) solid var(--line);border-radius:16px;padding:20px 16px 14px;overflow:hidden;box-shadow:var(--sh-sm)}
+  .loopstrip .step::before{content:"";position:absolute;inset:0 0 auto 0;height:8px;background:var(--c,var(--ink))}
+  .loopstrip .step b{display:block;font:800 .8rem/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink);margin-bottom:4px}
+  .loopstrip .step span{font-size:.92rem;color:var(--body);line-height:1.45;display:block}
+  .loopstrip .step.set{--c:var(--set)} .loopstrip .step.fold{--c:var(--fold)} .loopstrip .step.turn{--c:var(--turn)}
+  .loopstrip .ar{align-self:center;color:var(--ink);font-size:1.5rem;font-weight:800}
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:26px 0;max-width:900px}
+  .stat{background:#fff;border:var(--bw) solid var(--line);border-radius:18px;padding:20px 22px;box-shadow:var(--sh-sm)}
+  .stat b{display:block;font-family:var(--display);font-size:clamp(2rem,4vw,2.7rem);line-height:1;letter-spacing:-.04em;color:var(--ink)}
+  .stat span{display:block;margin-top:10px;font-size:.92rem;line-height:1.4;color:var(--muted);font-weight:500}
+  .stat.blue b{color:var(--blue)} .stat.red b{color:var(--red)}
+  .stat .cmp-title{margin:0 0 4px;font-weight:700;color:var(--ink);font-size:.95rem}
+  .stat .cmp{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:6px 0;border-top:2px solid rgba(17,19,24,.12)}
+  .stat .cmp span{margin:0;font-weight:600;color:var(--ink);font-size:.95rem}
+  .stat .cmp b{display:inline;font-size:clamp(1.6rem,3vw,2.1rem)}
+  .stat .cmp b.bad{color:var(--red)} .stat .cmp b.good{color:var(--blue)}
+  /* the proof band is a dark screen */
+  #real>.wrap{background:radial-gradient(120% 120% at 100% 0%,#1d2a4a 0%,var(--screen) 55%);color:#dfe5f0}
+  #real h2{color:#fff} #real .sub{color:#b9c3d6} #real b{color:#fff}
+  #real .kicker{color:#b9c3d6} #real .kicker .n{background:var(--yellow);color:var(--ink)}
+  #real .kicker::after{background:repeating-linear-gradient(90deg,rgba(255,255,255,.25) 0 6px,transparent 6px 12px)}
+  #real .stat{background:var(--screen2);border-color:#000} #real .stat b{color:#fff} #real .stat span{color:#c3cbdb}
+  #real .stat.yellow b{color:var(--yellow)}
+  #real .callout{background:var(--screen2);color:#eef2fa;border-color:#000;border-left-color:var(--red)}
+  /* resources */
+  .reslist{list-style:none;padding:0;max-width:74ch;margin:14px 0 0}
+  .reslist li{background:#fff;border:var(--bw) solid var(--line);border-radius:14px;padding:14px 16px;margin:12px 0;font-size:.96rem;box-shadow:3px 3px 0 var(--line)}
+  .reslist a{font-weight:700}
+  /* footer */
+  footer{background:var(--ink);color:#d3d9e6;margin-top:40px;padding:56px 16px 64px;border-top:var(--bw) solid #000}
+  footer .wrap{display:grid;grid-template-columns:auto minmax(0,1fr);gap:28px 40px;align-items:start;font-size:.92rem}
+  footer .brand{font-size:1.2rem}
+  footer p{margin:0 0 12px;max-width:80ch}
+  footer em{color:#fff}
+
+  /* gentle reveal where the browser supports scroll-driven animation (content is always visible otherwise) */
+  @supports (animation-timeline: view()){
+    @media (prefers-reduced-motion: no-preference){
+      section>.wrap{animation:rise linear both;animation-timeline:view();animation-range:entry 0px entry 220px}
+    }
+  }
+  @keyframes rise{from{opacity:.001;transform:translateY(34px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto} *{transition:none!important}}
+
+  @media(max-width:960px){
+    .hero-card{grid-template-columns:1fr}
+    .hero-art{max-width:420px;width:100%;justify-self:center}
+    .split{grid-template-columns:1fr}
+    .split>.demo{position:static;order:-1}
+    footer .wrap{grid-template-columns:1fr}
+  }
+  @media(max-width:720px){
+    .moves{grid-template-columns:1fr} .grid2{grid-template-columns:1fr}
+    .count{width:100%;margin:6px 0 0} .loopstrip .ar{display:none}
+    section{padding:14px 12px} header.hero{padding:20px 12px 12px} .hero .wrap{padding:0}
+    section>.wrap{box-shadow:4px 4px 0 var(--line);border-radius:20px}
+    .hero-card{box-shadow:6px 6px 0 var(--line);border-radius:24px}
+    .brand span{display:none}
+    .filter{top:52px}
+  }
+</style>
+</head>
+<body id="top">
+
+<header class="hero">
+  <div class="wrap"><div class="hero-card">
+   <div class="hero-copy">
+    <p class="eyebrow"><span class="dots" aria-hidden="true"><i style="background:#1F5FD1"></i><i style="background:#FFC20E"></i><i style="background:#D92B24"></i></span>A tutorial for anyone — just everyday arithmetic</p>
+    <h1>Quantum computing is really just <span class="grad">three moves</span></h1>
+    <p class="lede">Courses make quantum computing look like forty hard tricks with strange names. Underneath, every one of them is one of three simple moves on one simple tool — two rings that slide past each other (you could draw them with a compass). Learn the three moves and you can understand all forty.</p>
+    <div class="cta">
+      <a class="btn primary" href="#promise">Start with the one idea →</a>
+      <a class="btn ghost" href="#all40">Browse all 40 tricks</a>
+      <a class="btn ghost" href="../quantum-on-the-two-rings-calculator-v1.0.html">Try the live calculator</a>
+    </div>
+    <div class="bignum">
+      <span class="from"><b>40</b><small>tricks to memorize</small></span>
+      <span class="arrow">→</span>
+      <span class="to"><b>3</b><small>moves to understand</small></span>
+    </div>
+   </div>
+   <figure class="hero-art">
+     <svg id="heroart" viewBox="0 0 400 400" role="img" aria-label="Two sixty-mark rings: the first stays still and the second slides across it; the yellow line joins their centres and the white line joins their two crossing points"></svg>
+     <figcaption>The one tool — two sliding rings</figcaption>
+   </figure>
+  </div></div>
+</header>
+
+<nav class="toc">
+  <div class="bar">
+    <a class="brand" href="#top" aria-label="Back to the top"><svg viewBox="0 0 64 40" aria-hidden="true"><circle cx="22" cy="20" r="16" fill="none" stroke="#4D8DFF" stroke-width="5"/><circle cx="42" cy="20" r="16" fill="none" stroke="#FF4B3E" stroke-width="5"/></svg><span>Three Moves</span></a>
+    <div class="links">
+    <a href="#promise">The idea</a>
+    <a href="#basics">What is a quantum computer?</a>
+    <a href="#instrument">The tool</a>
+    <a href="#setting">1 · Setting</a>
+    <a href="#fold">2 · Fold</a>
+    <a href="#turn">3 · Turn</a>
+    <a href="#loop">The loop</a>
+    <a href="#all40">All 40 tricks</a>
+    <a href="#gift">It checks itself</a>
+    <a href="#real">It's real</a>
+    <a href="#deeper">Go deeper</a>
+    </div>
+    <div class="progress" id="progress"></div>
+  </div>
+</nav>
+
+<main>
+
+<section id="promise">
+  <div class="wrap">
+    <p class="kicker"><span class="n">01</span>The idea</p>
+    <h2>The one idea</h2>
+    <p class="sub">Read this part even if you read nothing else</p>
+    <p>Courses teach quantum computing as a long list of tricks with strange names — forty of them. You would have to learn each one separately.</p>
+    <p>This page teaches them a different way. There is <b>one tool</b> — two rings that slide against each other — and there are only <b>three things you ever do with it</b>. Tap a card to see its moving picture.</p>
+    <div class="moves" style="margin-top:16px">
+      <a class="move set" href="#setting">
+        <svg class="icon" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="26" cy="32" r="18" fill="none" stroke="#1F5FD1" stroke-width="3"/>
+          <circle cx="38" cy="32" r="18" fill="none" stroke="#1F5FD1" stroke-width="3"/>
+          <line x1="26" y1="32" x2="38" y2="32" stroke="#FFC20E" stroke-width="5" stroke-linecap="round"/>
+          <line x1="32" y1="18" x2="32" y2="46" stroke="#141414" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <span class="tag">Move 1</span>
+        <h3>The Setting</h3>
+        <p class="one">Name one spot and read its numbers.</p>
+        <p>Slide the rings to one spot and read the numbers there — the <b>readings</b>.</p>
+        <span class="go">see it move →</span>
+      </a>
+      <a class="move fold" href="#fold">
+        <svg class="icon" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="34" r="20" fill="none" stroke="#141414" stroke-width="3"/>
+          <line x1="32" y1="34" x2="14" y2="26" stroke="#E0A800" stroke-width="4" stroke-linecap="round"/>
+          <line x1="32" y1="34" x2="50" y2="22" stroke="#1F5FD1" stroke-width="4" stroke-linecap="round"/>
+          <path d="M20 30 A 14 14 0 0 1 44 26" fill="none" stroke="#141414" stroke-width="2" stroke-dasharray="3 3"/>
+        </svg>
+        <span class="tag">Move 2</span>
+        <h3>The Fold</h3>
+        <p class="one">Multiply readings, get one simple reading.</p>
+        <p>Multiply a reading by itself (or two readings together) and the answer turns into one simple reading at a new spot.</p>
+        <span class="go">see it move →</span>
+      </a>
+      <a class="move turn" href="#turn">
+        <svg class="icon" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="20" fill="none" stroke="#D92B24" stroke-width="3"/>
+          <line x1="32" y1="32" x2="40" y2="14" stroke="#1E9E5A" stroke-width="4" stroke-linecap="round"/>
+          <line x1="32" y1="32" x2="48" y2="40" stroke="#1F5FD1" stroke-width="4" stroke-linecap="round"/>
+          <path d="M40 22 A 12 12 0 0 1 44 36" fill="none" stroke="#D92B24" stroke-width="3"/>
+          <polygon points="44,36 40,33 47,31" fill="#D92B24"/>
+        </svg>
+        <span class="tag">Move 3</span>
+        <h3>The Turn</h3>
+        <p class="one">Move from one spot to another.</p>
+        <p>Step the ring round to a new spot. Every step comes with a check number, so a wrong step shows up.</p>
+        <span class="go">see it move →</span>
+      </a>
+    </div>
+    <div class="callout">
+      <b>Every one of the forty quantum computing tricks is one of these three moves.</b>
+      Below, you'll see each move as a moving picture, then all forty tricks — each one showing which move it is, and why.
+    </div>
+  </div>
+</section>
+
+<section id="basics">
+  <div class="wrap">
+    <p class="kicker"><span class="n">02</span>The basics</p>
+    <h2>What is a quantum computer? Five simple ideas</h2>
+    <p class="sub">Start here if these words are new — each has short videos</p>
+    <p>Before the three moves make sense, here's the whole subject in five simple ideas. Each one has a ▶ button that opens short videos about it.</p>
+    <div class="concepts">
+      <div class="concept">
+        <p class="q">Idea 1</p>
+        <h3>A <em>bit</em> is a 0 or a 1</h3>
+        <p>An ordinary computer stores everything as bits — tiny switches that are either off (0) or on (1). Everything it does is flipping switches and combining them.</p>
+        <a class="vlink" href="https://www.youtube.com/results?search_query=what+is+a+bit+computer+explained" target="_blank" rel="noopener">watch: what is a bit</a>
+      </div>
+      <div class="concept">
+        <p class="q">Idea 2</p>
+        <h3>A <em>qubit</em> can be a blend of both</h3>
+        <p>A quantum bit — a <b>qubit</b> — can be 0, or 1, or a <em>blend</em> of both at once. Picture a dial with 0 at one end and 1 at the other: the needle can point anywhere in between. Where it points (its <b>blend angle</b>) gives two numbers between 0 and 1 — its <b>reading for 0</b> and its <b>reading for 1</b>. A qubit also has a second angle, its <b>phase</b> — think of it as which way the dial is facing, like a compass direction. The phase doesn't change the readings, but it matters when qubits are combined.</p>
+        <p class="ringline">On the rings: where the needle points is a <b>setting</b>, and both readings come straight off it.</p>
+        <a class="vlink" href="https://www.youtube.com/results?search_query=what+is+a+qubit+superposition+explained" target="_blank" rel="noopener">watch: what is a qubit</a>
+      </div>
+      <div class="concept">
+        <p class="q">Idea 3</p>
+        <h3>A <em>gate</em> is an instruction for the needle</h3>
+        <p>You compute by giving the qubit instructions called <b>gates</b>. Some gates are known by the spot they aim for ("go to 30°"); some by how far they shift the needle ("shift a quarter of the way round"); some link two qubits together. A quantum program is a list of gates, run one after another.</p>
+        <p class="ringline">On the rings: a gate known by the numbers at its spot is a <b>setting</b>. A gate known by how far it shifts — and running gates one after another — is a <b>turn</b>.</p>
+        <a class="vlink" href="https://www.youtube.com/results?search_query=quantum+logic+gates+explained+for+beginners" target="_blank" rel="noopener">watch: quantum gates</a>
+      </div>
+      <div class="concept">
+        <p class="q">Idea 4</p>
+        <h3><em>Measuring</em> gives a 0 or a 1</h3>
+        <p>Inside a real machine you can't see the needle. When you measure a qubit, it jumps to a plain 0 or 1. Which one is down to chance: the chance of a 0 is its reading for 0 multiplied by itself, and the chance of a 1 is its reading for 1 multiplied by itself. The two chances always add up to 1. Measure many times and you see the odds.</p>
+        <p class="ringline">On the rings: multiplying a reading by itself is the <b>fold</b>.</p>
+        <a class="vlink" href="https://www.youtube.com/results?search_query=quantum+measurement+explained+simply" target="_blank" rel="noopener">watch: quantum measurement</a>
+      </div>
+      <div class="concept">
+        <p class="q">Idea 5</p>
+        <h3><em>Entanglement</em> links qubits</h3>
+        <p>Two qubits can be linked so that their results match far more often than chance allows. Einstein called it "spooky." This linking is a big part of what makes quantum computers powerful.</p>
+        <p class="ringline">On the rings: to measure how linked two qubits are, you multiply their results together (counting a 0 as +1 and a 1 as −1, so that "same" and "different" results show up as plus and minus) — a <b>fold</b>.</p>
+        <a class="vlink" href="https://www.youtube.com/results?search_query=quantum+entanglement+explained+simply" target="_blank" rel="noopener">watch: entanglement</a>
+      </div>
+      <div class="concept" style="background:#FFF7DD">
+        <p class="q">Put together</p>
+        <h3>So what <em>is</em> a quantum computer?</h3>
+        <p>A row of these dials (qubits). You set them, measure them to get the answer as odds, then step them toward a better answer (for example, the lowest energy a molecule can have) — and repeat until the answer is good. Every one of the forty tricks further down is just one part of this.</p>
+        <a class="vlink" href="https://www.youtube.com/results?search_query=how+do+quantum+computers+work+explained" target="_blank" rel="noopener">watch: how quantum computers work</a>
+      </div>
+    </div>
+    <div class="callout">Keep those five ideas in mind. Next: the tool this whole page is built on — and how pointing, multiplying and stepping become the three moves.</div>
+  </div>
+</section>
+
+<section id="instrument">
+  <div class="wrap">
+    <p class="kicker"><span class="n">03</span>The tool</p>
+    <h2>Meet the tool: two sliding rings</h2>
+    <p class="sub">No quantum computing yet — just the rings</p>
+    <p>Draw a circle and put sixty marks around it, like the minutes on a clock. On each mark write one digit. The digits come from a famous number pattern (the Fibonacci numbers): start with 0 and 1, then each new number is the two before it added together — 0, 1, 1, 2, 3, 5, 8, 13, 21, 34 … Write down only the <b>last digit</b> of each: 0, 1, 1, 2, 3, 5, 8, 3, 1, 4 … After sixty numbers the last digits start over, so they fit the sixty marks exactly. Those digits are what let the ring check its own work. Here is the whole ring:</p>
+
+    <figure class="fig wheelwrap">
+      <svg id="digitwheel" viewBox="0 0 440 440" role="img" aria-label="The sixty-mark ring with a Fibonacci last digit on every mark; the four marks at 9, 12, 3 and 6 o'clock carry zero"></svg>
+      <figcaption>The sixty-ring. Going clockwise from 9 o'clock: 0, 1, 1, 2, 3, 5, 8, 3, 1, 4 … The four marks at 9, 12, 3 and 6 o'clock all carry 0.</figcaption>
+    </figure>
+
+    <p style="margin-top:20px">Now take <b>two</b> of these rings and lay them side by side so they overlap. Hold the first ring still and slide the second along the line through the centres. Where their edges meet there are two crossing points. How far apart those two crossing points are, measured around the ring, is the <b>angle</b> — 0° when the rings just touch, opening up to 180° when they sit right on top of each other. Each way you slide them is one <em>setting</em>, and it gives you two lengths at once:</p>
+    <ul class="clean">
+      <li><b>the across-length</b> — the distance between the two ring centres,</li>
+      <li><b>the up-length</b> — the distance between the two points where the rings cross.</li>
+    </ul>
+    <p>Draw the rings with a radius of 1 (any unit — say 1 inch). Then <b>half of each length is a reading</b> — a number from 0 to 1. Half the across-length is the qubit's <b>reading for 0</b>; half the up-length is its <b>reading for 1</b>. You don't work these out — you read them off, the way you read the time off a clock. <em>Calculator check</em> (set the calculator to degrees): the reading for 0 is the cosine of <b>half</b> the angle, and the reading for 1 is the sine of half the angle — at 60°, cos 30° = 0.866 and sin 30° = 0.500.</p>
+    <p>The two crossing points sit over two marks of the ring that mirror each other (like "5 past" and "5 to" on a clock). Their digits always follow a fixed rule: they are either equal or they add up to 10. If they don't, the spot was misread — so every reading comes with its own check. And between any two marks you can add sixty finer marks, like millimetres between the centimetres on a ruler; the same digit pattern works on those too, so any angle you can write down in decimals can be read exactly. Keep three facts in mind and the rest of the page follows:</p>
+
+    <div class="grid2">
+      <div class="callout"><b>Fact 1 — a setting is the numbers at one spot.</b> Slide the rings to one spot and read them. Reading is all there is to it.</div>
+      <div class="callout fold"><b>Fact 2 — the fold turns multiplying into reading.</b> To multiply the reading for 0 by itself, you don't multiply: slide to double the angle, take the reading for 0 there, add 1 and halve. Example at 60°: the reading for 0 at 120° is cos 60° = 0.5, and (1 + 0.5) ÷ 2 = 0.75 — the same as 0.866 × 0.866. Up to 90° you slide straight to the double angle. Past 90° the double angle is more than 180°: the sliding ring passes through the still ring and comes out on its other side, and a reading on that side counts as negative. The arithmetic rule still works. (The chance of 1 is what's left: 1 minus that.)</div>
+    </div>
+    <div class="callout turn"><b>Fact 3 — every step carries a check number.</b> Step a quarter of the way round (fifteen marks) and the digit you land on is always the starting digit times 7 — keep only the last digit: 8 → 56 → 6. Step back a quarter and it's times 3. If you land on the wrong digit, you know the step went wrong. That's the built-in error check.</div>
+  </div>
+</section>
+
+<section id="setting">
+  <div class="wrap">
+    <p class="kicker"><span class="n set">04</span>Move 1 of 3</p>
+    <h2 class="mt set">Move 1 — The Setting</h2>
+    <p class="sub" style="margin-top:14px">Name one spot and read its numbers</p>
+
+    <div class="split">
+      <div class="copy">
+    <p>A setting is just <b>one spot</b> — the second ring slid to one place across the first, like a dial pointing at an angle. Every spot comes with its own two readings. Move to a new spot and both readings change. So the angle and its two readings tell you the same thing.</p>
+    <p>Here's why that matters: <b>a qubit's condition is exactly one such spot.</b> Its two readings say how much 0 and how much 1 it is right now. So to describe a qubit, you don't need a page of numbers — just one spot.</p>
+    <p>One kind of damage to a qubit ("noise") doesn't move the spot — it blurs the qubit, so its readings come out weaker, exactly as if the rings had <b>shrunk</b>. A perfect qubit uses full-size rings; a damaged one is the same spot on smaller rings. So reading how much the rings shrank tells you how much damage there is.</p>
+    <div class="callout"><b>Setting vs. Turn:</b> a setting is about the <em>numbers at a spot</em>; a turn is about a <em>shift</em> — how far you move. A gate known by its numbers (like a rotation gate or Hadamard) is a setting. A gate known by how far it shifts (like the S and Z gates, which shift the phase) is a turn — and so is running gates one after another.</div>
+    <div class="callout"><b>The Setting test:</b> Is the trick about the numbers at a spot — naming a spot and reading what's there? Then it's a setting. Fourteen of the forty tricks are settings.</div>
+      </div>
+    <figure class="demo set">
+      <span class="live">live</span>
+      <svg id="setdemo" viewBox="0 0 460 270" role="img" aria-label="Animation: the first ring stays still and the second slides across it to different settings; the across-length between their centres and the up-length between their crossings change together"></svg>
+      <figcaption>Watch the second ring slide across the first, which stays still. At every setting you read two lengths at once — the across-length (yellow) and the up-length (white). Half of each is a reading: the reading for 0 and the reading for 1.</figcaption>
+    </figure>
+    </div>
+  </div>
+</section>
+
+<section id="fold">
+  <div class="wrap">
+    <p class="kicker"><span class="n fold">05</span>Move 2 of 3</p>
+    <h2 class="mt fold">Move 2 — The Fold</h2>
+    <p class="sub" style="margin-top:14px">Multiply readings, get one simple reading</p>
+
+    <div class="split">
+      <div class="copy">
+    <p>The fold is one simple fact: <b>when you multiply readings together, the answer turns out to be one single reading at a new spot.</b> You never have to do the multiplying — you just read a different spot.</p>
+    <ul class="clean">
+      <li>Multiply the reading for 0 by itself → take the reading for 0 at <b>double</b> the angle, add 1 and halve (at 60°: (1 + 0.5) ÷ 2 = 0.75). The chance of 1 is what's left.</li>
+      <li>Multiply a qubit's two readings together, and double it → the reading for 1 at <b>double</b> the angle.</li>
+      <li>For two linked qubits: measure both, and multiply the two answers each time (count a 0 as +1 and a 1 as −1). On average you get one reading, set by the <b>difference</b> of their two angles.</li>
+      <li>For three linked qubits: the same with all three → one reading, set by their three angles <b>added together</b>. (Difference or sum depends on how the qubits were linked.)</li>
+    </ul>
+    <p>Why it matters: measuring a qubit — getting the odds of 0 or 1 — <em>is</em> multiplying a reading by itself (Idea 4). So every set of odds, every score, every "how sure are we," and every link between qubits comes from this one move.</p>
+    <div class="callout fold"><b>The Fold test:</b> Does it multiply readings together (or multiply one by itself)? Then it's a fold. Ten of the forty are folds.</div>
+      </div>
+    <figure class="demo fold">
+      <span class="live">live</span>
+      <svg id="folddemo" viewBox="0 0 460 270" role="img" aria-label="Animation: a reading at one angle; a second hand at double the angle; two bars show that squaring the reading matches what you read at double the angle"></svg>
+      <figcaption>The yellow hand shows the setting's angle; the white hand sits at double the angle. The two bars always match: the reading for 0 multiplied by itself (left) equals the reading for 0 at double the angle, plus 1, halved (right). Example: at 60° the reading for 0 is 0.866, and 0.866 × 0.866 = 0.75 — a 75% chance of 0.</figcaption>
+    </figure>
+    </div>
+  </div>
+</section>
+
+<section id="turn">
+  <div class="wrap">
+    <p class="kicker"><span class="n turn">06</span>Move 3 of 3</p>
+    <h2 class="mt turn">Move 3 — The Turn</h2>
+    <p class="sub" style="margin-top:14px">Move from one spot to another</p>
+
+    <div class="split">
+      <div class="copy">
+    <p>A turn moves the dial from one spot to another, anywhere round the sixty marks. Steps add up: a step of 10 marks and a step of 20 marks make a step of 30. And each step comes with a <b>check number</b>: a quarter turn always multiplies the digit by 7, a half turn by 9 (which swaps a digit for the partner it adds up to 10 with, like 8 ↔ 2 — and 0 stays 0), and a three-quarter turn by 3.</p>
+    <p>A turn can shift either of the qubit's two angles (Idea 2). Shift the <b>blend angle</b> and the readings change — turn 30° a quarter of the way round to 120° and the readings go from 0.966 and 0.259 to 0.500 and 0.866. Shift the <b>phase</b> and the readings stay exactly the same; only the direction the qubit faces changes. Both are turns.</p>
+    <p>Why it matters: to make a program better, you need to know which way to adjust each angle. The trick everyone uses reads the answer a quarter turn forward and a quarter turn back, and compares the two. That's two turns — and their check numbers prove both steps were right before they're compared. Merging gates, Grover's search, teleportation's fix-up (you'll meet them in the list below) — all of them are steps from spot to spot.</p>
+    <div class="callout turn"><b>The Turn test:</b> Is the trick about a shift — how far you move, one step or a chain of steps? Then it's a turn. Sixteen of the forty are turns — the biggest group — and the one trick from 2025 at the end of the list is a turn as well.</div>
+      </div>
+    <figure class="demo turn">
+      <span class="live">live</span>
+      <svg id="turndemo" viewBox="0 0 320 300" role="img" aria-label="Animation: a marker steps a quarter turn clockwise around the ring, and its digit is multiplied by seven"></svg>
+      <figcaption>A quarter turn steps the marker fifteen marks clockwise — here from mark 6 (digit 8) to mark 21 (digit 6), the same marks as on the big ring above. The digit is multiplied by 7 (keep the last digit): 8 → 56 → 6. The digit proves the step landed right.</figcaption>
+    </figure>
+    </div>
+  </div>
+</section>
+
+<section id="loop">
+  <div class="wrap">
+    <p class="kicker"><span class="n">07</span>The loop</p>
+    <h2>Now watch the three moves <em>become</em> a quantum computer</h2>
+    <p class="sub">How the three moves fit together into a real program</p>
+    <p>Here is what a real quantum program does, start to finish. It's nothing but the three moves:</p>
+    <div class="loopstrip">
+      <div class="step set"><b>1 · Set</b><span>put the qubits at a starting spot</span></div>
+      <span class="ar">→</span>
+      <div class="step fold"><b>2 · Fold</b><span>measure: turn readings into odds and a score</span></div>
+      <span class="ar">→</span>
+      <div class="step turn"><b>3 · Turn</b><span>step the angles toward a better score</span></div>
+      <span class="ar">↺</span>
+      <div class="step" style="border-top-color:var(--ink)"><b>repeat</b><span>until the score stops improving</span></div>
+    </div>
+    <p>That loop — <span class="chip set">set</span> <span class="chip fold">fold</span> <span class="chip turn">turn</span>, repeat — is how the most common programs on today's quantum computers work. You've already seen each move as a moving picture above.</p>
+    <p>A real example from the research this page is built on. Chemists want the lowest energy a molecule can have — that's the shape the molecule actually settles into — so the score is the energy, and lower is better. For this molecule, one angle describes the pair of qubits. The program sets that angle, reads the energy (a fold), and steps to the best spot. It needs just three readings. The answer lands exactly on one mark of the ring. Same three moves, doing real chemistry.</p>
+    <div class="callout">So the forty tricks below aren't a new subject. Each one is just a piece of this loop — a way of setting, folding or turning.</div>
+  </div>
+</section>
+
+<section id="all40">
+  <div class="wrap">
+    <p class="kicker"><span class="n">08</span>The 40 tricks</p>
+    <h2>All forty tricks, decoded — and one from 2025</h2>
+    <p class="sub">Look one up when you meet it — no need to memorize</p>
+    <p>These are the strange names you'll meet in any quantum computing course, plus one experiment from 2025 that no course teaches yet. Each card says in plain words <b>what the trick is</b>, <b>which of the three moves it is and why</b>, and has a ▶ button for short videos. Use the buttons to show one move at a time.</p>
+    <div class="callout"><b>When a trick seems to fit two moves:</b> most tricks touch more than one move (almost everything reads something at the end). Each one is filed by its <b>main job</b> — the step that makes it that trick. If the key step is the numbers at a spot, it's a Setting. If the key step is multiplying readings, it's a Fold. If the key step is shifting or stepping, it's a Turn.</div>
+    <div class="filter" id="filter">
+      <button data-f="all" class="on">All 41</button>
+      <button data-f="set">Settings · 14</button>
+      <button data-f="fold">Folds · 10</button>
+      <button data-f="turn">Turns · 17</button>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="tools" id="tools"></div>
+  </div>
+</section>
+
+<section id="gift">
+  <div class="wrap">
+    <p class="kicker"><span class="n">09</span>It checks itself</p>
+    <h2>The free gift: it checks itself</h2>
+    <p class="sub">Why use the rings instead of an ordinary calculator</p>
+    <p>Besides its qubits, every quantum computer is run by an ordinary computer that keeps track of all the angles and other numbers. Those ordinary numbers are normally <em>never checked</em>. If a stray particle from space or a glitch flips one bit, nobody notices, and the answer quietly comes out wrong.</p>
+    <p>On the rings, every mark has its own check. Take the digit on a mark and the digit on the next mark: that pair of digits belongs to that mark and no other. The pair travels with the mark, so if the mark gets changed, the pair it carries no longer fits the new mark, and the damage shows up. There's no extra work — the check happens in the same move as the work.</p>
+    <p>Big numbers the machine keeps are written across six sixty-rings, like a car's odometer with six wheels, where each wheel has sixty marks instead of ten. Each wheel carries its pair of check digits. The machine keeps two copies side by side: the number in its usual form, and the same number on the six wheels. Every number has its own wheel pattern — no two numbers share one — so if the number gets damaged, it no longer matches its wheels, and the damage is caught. <b>Every damaged number is caught — 100% of them.</b> Then it is fixed: the machine works the number out again from the angle written in the program. In the research, 5,383,856 damaged numbers were thrown at it. Every one was caught, and every one was fixed.</p>
+    <p>Some computer chips today do check their numbers, with a quick remainder trick called a <a href="https://patents.google.com/patent/US20140188965A1/en" target="_blank" rel="noopener">residue check</a> (<a href="https://www.youtube.com/results?search_query=residue+check+error+detection+computer+arithmetic" target="_blank" rel="noopener">videos</a>). When a number gets damaged, that check misses it about 1 time in 3. The rings miss none.</p>
+    <div class="stats">
+      <div class="stat blue"><b>100%</b><span>of damaged numbers caught — 5,383,856 out of 5,383,856 in the test</span></div>
+      <div class="stat blue"><b>100%</b><span>of damaged numbers fixed — every one put back to its correct value</span></div>
+      <div class="stat"><span class="cmp-title">When a number gets damaged, how often is it missed?</span>
+        <div class="cmp"><span>The <a href="https://patents.google.com/patent/US20140188965A1/en" target="_blank" rel="noopener">residue check</a> chips use today</span><b class="bad">32%</b></div>
+        <div class="cmp"><span>The rings</span><b class="good">0%</b></div>
+      </div>
+    </div>
+    <div class="callout">In short: the rings don't just do the work — they catch every bad number as they go, and every one gets fixed.</div>
+  </div>
+</section>
+
+<section id="real">
+  <div class="wrap">
+    <p class="kicker"><span class="n">10</span>It's real</p>
+    <h2>It's real — it ran on a real quantum computer</h2>
+    <p class="sub">Not just an idea on paper</p>
+    <p>This has been run on IBM's real 156-qubit quantum computer. Every angle carried its check digits. In a normal run, the built-in check stayed quiet — it read close to zero, exactly where the math said it would be. Then one single bit was flipped on purpose before the job was sent — and the check went off like a fire alarm, more than a hundred times bigger than the normal random wobble. When the same flipped bit was sent <em>without</em> the check, the machine turned the best possible answer into the worst possible answer, with no warning at all.</p>
+    <div class="stats">
+      <div class="stat"><b>156</b><span>qubits on IBM's real machine</span></div>
+      <div class="stat yellow"><b>112×</b><span>how loud the alarm was, next to the normal random wobble</span></div>
+      <div class="stat"><b>1 bit</b><span>flipped on purpose — and caught 100% of the time</span></div>
+    </div>
+    <div class="callout turn"><b>The takeaway.</b> Forty tricks shrink down to three moves anyone can picture — and the picture comes with a built-in lie detector. That's a new way to learn quantum computing: three moves instead of forty recipes.</div>
+  </div>
+</section>
+
+<section id="deeper">
+  <div class="wrap">
+    <p class="kicker"><span class="n">11</span>Next steps</p>
+    <h2>Go deeper</h2>
+    <p class="sub">Good next stops when you want more</p>
+    <p>This page gives you the map. When you want more, these are good next stops. The ▶ buttons open short videos; the text links are free lessons.</p>
+    <ul class="reslist">
+      <li><b>Try it live</b> — the <a href="../quantum-on-the-two-rings-calculator-v1.0.html">Quantum Computing on the Two Rings calculator</a>: every trick on this page computed on the rings, with the instrument under a slider.</li>
+      <li><b>The rings themselves</b> — <a href="https://nealstrassner.github.io/one-setting-trig-rings/" target="_blank" rel="noopener">Two Rings, Sine and Cosine at Once</a> (slide the second ring yourself) and the <a href="https://nealstrassner.github.io/neals-net-calculator/" target="_blank" rel="noopener">Neal's Net calculator</a> (the sixty-ring and its checks).</li>
+      <li><b>The papers behind the tool</b> — <a href="https://doi.org/10.5281/zenodo.22833894" target="_blank" rel="noopener">Two Sliding Rings</a> and <a href="https://doi.org/10.5281/zenodo.20754147" target="_blank" rel="noopener">Neal's Net, Version 3</a>, both free to read on Zenodo.</li>
+      <li><a class="vlink" href="https://www.youtube.com/results?search_query=quantum+computing+for+beginners+full+explainer" target="_blank" rel="noopener">watch: quantum computing for beginners</a> — a gentle video tour of the whole subject.</li>
+      <li><a class="vlink" href="https://www.youtube.com/results?search_query=3blue1brown+quantum" target="_blank" rel="noopener">watch: the math, with pictures</a> — animated explanations that build the ideas step by step.</li>
+      <li><b>Quantum Country</b> — a free, friendly written course that helps you remember what you read: <a href="https://quantum.country" target="_blank" rel="noopener">quantum.country</a>.</li>
+      <li><b>IBM's free lessons</b> — IBM teaches quantum computing with its free tool called Qiskit: <a class="vlink" href="https://www.youtube.com/results?search_query=IBM+Qiskit+quantum+computing+tutorial+beginner" target="_blank" rel="noopener">watch: IBM Qiskit lessons</a></li>
+    </ul>
+    <div class="callout">Whenever the strange names pile up, come back here. Every trick is one of three moves: a <span class="chip set">setting</span>, a <span class="chip fold">fold</span>, or a <span class="chip turn">turn</span>.</div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="#top"><svg viewBox="0 0 64 40" aria-hidden="true"><circle cx="22" cy="20" r="16" fill="none" stroke="#4D8DFF" stroke-width="5"/><circle cx="42" cy="20" r="16" fill="none" stroke="#FF4B3E" stroke-width="5"/></svg><span>Three Moves</span></a>
+    <div>
+    <p>Tutorial companion to <a href="https://doi.org/10.5281/zenodo.23265483" target="_blank" rel="noopener"><em>Quantum Computing on the Sixty-Ring: Every Gate a Setting, Every Gradient a Quarter Turn, and a Checksum on the Classical Half</em></a> and <a href="https://doi.org/10.5281/zenodo.23265465" target="_blank" rel="noopener"><em>The Qubit on the Two Rings</em></a>, by Neal Strassner (2026). The three moves, the sixty-ring, and the self-checking digits are his. This page teaches them; it makes no claims beyond the papers.</p>
+    <p>Made as a teaching aid. Only everyday arithmetic is needed to get the idea — the three moves are the whole thing. The moving pictures pause when you switch tabs, and hold still if your device asks for less motion.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ============================ the 40 tricks ============================ */
+const TOOLS = [
+  // SETTINGS (14) — test: is it just naming and reading spots, without moving anything?   [move, name, what-it-is, how-it's-the-move, video-search]
+  ["set","Rotation gates","The basic instruction for a qubit: \"point the needle at this angle.\" Almost every quantum program is built from these.","The name says \"rotation\", but a single rotation gate is fully described by the spot it points to: read its two numbers off that spot. The trick is about the numbers.","quantum rotation gates Rx Ry Rz explained"],
+  ["set","Any single-qubit gate","Any change you could ever make to one qubit. Mathematicians proved every one of them can be written down with just three spots.","Writing one down means naming three spots and reading their numbers — the trick is about the numbers at those spots.","single qubit gate bloch sphere explained"],
+  ["set","Hadamard, CZ, CNOT","The three most-used ready-made gates. Hadamard is the gate for an exact 50/50 blend. CNOT and CZ are the gates that link two qubits.","Each one is known by a fixed table of numbers: Hadamard's is an even 50/50 split; CNOT's and CZ's are fixed tables for two linked qubits. Their main job is to be those ready-made tables — you read them off.","hadamard cnot gate explained"],
+  ["set","Noise channels","Real qubits get damaged over time, a bit like a photo fading. \"Noise channels\" are the standard kinds of damage.","This kind of damage doesn't move the spot — it shrinks the rings. Same spot, smaller rings. You read the damage off that one setting.","quantum decoherence and noise explained"],
+  ["set","Magic states","A special ingredient (a \"magic\" qubit) that a full quantum computer needs for its hardest gate (called T). The everyday fixed gates (Hadamard, CNOT, S, Z) can't make it on their own.","Think of the tip of the needle. On a perfect qubit it sits on the ring, outside a square drawn through the ring's four 0 marks — that's magic. Noise shrinks the reach and pulls the tip inward; once it's inside the square, the magic is gone. (Almost every point on the ring is magic — the hard part is making one cleanly.) Read where the tip is.","magic states quantum computing"],
+  ["set","Error mitigation & benchmarking","Working out how much damage the machine does, cleaning that damage out of the answer, and scoring how good the machine is.","It's all read off one number: how much the rings have shrunk. The clean answer is that same reading, scaled back to full size.","quantum error mitigation explained"],
+  ["set","Entropy","One number for how mixed-up (unsure) a qubit has become — zero when it's perfect.","It's just how much the rings have shrunk. One reading.","von neumann entropy explained"],
+  ["set","Phase estimation / QFT","QFT means \"quantum Fourier transform.\" Together they read a hidden angle and write it out as ordinary 0s and 1s. Many famous programs use them.","The hidden angle is exactly one of the ring's marks (or one of its finer marks) — you just read which mark it is.","quantum phase estimation explained"],
+  ["set","Shor's order-finding","The heart of Shor's program — the one that could crack today's internet locks — by finding a hidden repeating pattern in numbers.","The possible answers are a few spots spaced evenly round the ring, like the corners of a square or a hexagon. Read which spots come up and count them.","shor's algorithm explained simply"],
+  ["set","Stabilizer codes","Error correction: spread one qubit's information over several, plus some \"check\" qubits. The checks can find and fix a mistake without disturbing the data.","Each check is one spot that should show a known value. Read the checks: the one that reads wrong points straight at the mistake.","quantum error correction explained"],
+  ["set","Linear-equations solver (HHL)","A famous method (named for its inventors Harrow, Hassidim and Lloyd) for solving big sets of linear equations — the kind behind engineering and data problems — on a quantum computer.","The hidden numbers it needs land exactly on marks of the ring, and its fix-up step is two more spots (60° and 180°). Name the spots, read the numbers.","HHL algorithm explained"],
+  ["set","Classical shadows","A way to learn a lot about a state from only a few random measurements, instead of measuring everything.","Each measurement is one reading of the needle, scaled up by three. Average the readings and the state comes back. It's reading spots.","classical shadows quantum explained"],
+  ["set","Probabilistic error cancellation","Undo the machine's damage on average, by running slightly different versions of the program with plus and minus weights.","The damage shrank the rings; the fix scales the reading back up by one over how much they shrank. One reading, rescaled.","probabilistic error cancellation explained"],
+  ["set","Lindblad equation","The physics equation for how a real qubit decays over time — fading and drifting at once.","The needle keeps turning at a steady rate while the rings slowly shrink. At any moment it's one setting on smaller rings; read it.","lindblad master equation qubit explained"],
+  // FOLDS (10) — test: does it multiply readings together (or one by itself)?
+  ["fold","Born's rule","The rule for what you actually see: the chance of getting a 0 is the reading for 0 multiplied by itself, and the chance of a 1 is the reading for 1 multiplied by itself.","Multiplying the reading for 0 by itself is the fold: it becomes the reading for 0 at double the angle, plus 1, halved. The chance of 1 is simply what's left.","born rule quantum measurement explained"],
+  ["fold","Variational energy (VQE)","VQE (\"variational quantum eigensolver\") is a top method on today's machines for chemistry. This card is its score: the \"energy\" of each guess — lower is better.","The energy is built by multiplying readings together; the fold turns it into one smooth reading that rises and falls as you change the angle. Its lowest point is the answer (at 120° in the research example).","variational quantum eigensolver VQE explained"],
+  ["fold","Uncertainty & shot noise","Each run gives a random 0 or 1, so you run many times (\"shots\") and average. The wobble left over is the uncertainty.","The wobble, multiplied by itself, is (chance of 0) × (chance of 1) divided by the number of runs — multiplying readings, a fold. At 60° with 100 runs: 0.75 × 0.25 ÷ 100 = 0.001875, so the wobble is about 0.043 (4 in 100). To halve the wobble you need four times as many runs.","shot noise quantum measurement"],
+  ["fold","Symmetry-check statistics","A cheap mistake-catcher: the answer must follow a known rule, and an alarm goes off only if the rule breaks by more than the normal wobble.","The alarm line is worked out by multiplying readings together (a fold): if the check moves past that line, the alarm sounds.","symmetry verification quantum computing"],
+  ["fold","State verification","Checking the machine really built what you asked for. You can't copy a qubit you've made, so you build it a second time from the same recipe and compare the two.","How alike two copies are depends on how far apart their angles are: it's the reading for 0 at that gap, multiplied by itself — a fold. Same angle: 1 × 1 = 1 (identical). One mark apart (6°): 0.9986 × 0.9986 = 0.997.","swap test quantum fidelity explained"],
+  ["fold","Entanglement & Bell tests","Entanglement links two qubits so their results match more often than chance allows. A Bell test (named after the physicist John Bell) is the experiment that proves it.","Measure both qubits and multiply their answers each time (0 counts as +1, 1 as −1). On average that's one reading, set by the difference of their two angles — a fold.","bell test entanglement explained"],
+  ["fold","Entanglement of a state","A number for how linked two qubits are: zero if they're separate, highest when they're fully linked.","For the two-qubit states used in the research, one setting describes the linked pair. Multiply its two readings together and double it — the fold gives one reading at double the angle: 0 means separate, 1 means fully linked.","quantum concurrence entanglement measure"],
+  ["fold","GHZ & Mermin tests","The same linking test with three qubits instead of two (GHZ and Mermin are the physicists' names) — an even stronger proof.","Measure all three and multiply the three answers. On average that's one reading, set by the three angles added together — a fold.","GHZ state Mermin inequality explained"],
+  ["fold","Cross-entropy benchmarking","The score Google used for its \"quantum supremacy\" claim: how close a noisy machine's results are to the ideal ones.","Multiply the ideal chance of each result by the measured chance, and add up — multiplying readings is a fold. Noise shrinks the score by exactly how much the rings shrank.","cross entropy benchmarking explained"],
+  ["fold","Quantum volume","IBM's single number for how big a program a machine can run well.","Count how often the machine lands on the likeliest results — a product of readings, a fold — and noise pulls that count down by how much the rings shrank.","quantum volume explained"],
+  // TURNS (16) — test: does it move from spot to spot?
+  ["turn","Gate composition","Two gates in a row can be merged into one, which makes programs shorter.","Two steps in a row are one bigger step — just add them.","quantum circuit compilation explained"],
+  ["turn","Parameter-shift gradient","A \"parameter\" is one of the program's angles; the \"gradient\" is which way to turn it to improve the answer. This rule finds it exactly.","Step a quarter turn forward, step a quarter turn back, and compare the two readings. Two steps.","parameter shift rule quantum gradient"],
+  ["turn","Clifford phases (S, Z, S†, T)","Fixed gates that don't change the chances of 0 or 1 at all — they only shift the qubit's phase (named after the mathematician Clifford; S†, said \"S-dagger\", is S undone). T, listed with them, is the special \"hard\" one that gives a quantum computer its full power.","Unlike a general rotation gate (known by the numbers at any angle), these are fixed-size shifts of the phase: a quarter (S, digit ×7), a half (Z, ×9), three-quarters (S†, ×3), an eighth (T, which lands on a finer mark and is checked by the finer marks' digits). The readings stay the same; only the phase moves. A shift is a turn.","clifford gates and T gate explained"],
+  ["turn","Optimizer","The ordinary computer's helper that decides how to adjust the angles to get a better answer.","Read the score where you are, a quarter step forward, and a quarter step back. From those three readings the best spot can be worked out exactly — the quarter steps are what make it a turn.","variational quantum algorithm optimizer"],
+  ["turn","Convergence","Why the optimizer's steps are sure to settle on an answer instead of going round forever.","Each step goes to the best spot for that angle, so the score can never get worse — and it can't go below the lowest possible score. Steps like that have to settle.","optimization convergence explained"],
+  ["turn","Grover's search","A famous method that finds one item in a huge unsorted list much faster than checking them one by one.","Each round steps the dial the same amount closer to the answer. Repeat until it points at it.","grover's algorithm explained simply"],
+  ["turn","Hamiltonian simulation (Trotter)","A Hamiltonian is the physics recipe for how a material or molecule changes over time. This acts it out on a quantum computer in tiny time steps (Trotter is the mathematician behind the method).","A long chain of small steps. Steps that point the same way simply add together.","hamiltonian simulation trotter explained"],
+  ["turn","QAOA","QAOA (\"quantum approximate optimization algorithm\") tackles hard planning problems — schedules, delivery routes — by taking turns between two kinds of adjustment.","Two kinds of step, taking turns: one, then the other, repeat.","QAOA quantum optimization explained"],
+  ["turn","Teleportation","Moving a qubit's exact condition to a faraway qubit, using a linked pair plus two ordinary bits of message. Nothing physical travels.","The receiver's fix-up is one of four: nothing; a half turn of the blend (swaps 0 and 1); a half turn of the phase; or both. The two bits say which.","quantum teleportation explained"],
+  ["turn","Superdense coding","Teleportation in reverse: send two ordinary bits by sending just one qubit.","The sender picks one of four: nothing; a half turn of the blend (swaps 0 and 1); a half turn of the phase; or both. Each gives a different result, carrying a two-bit message.","superdense coding explained"],
+  ["turn","Dynamical decoupling","A trick that keeps a qubit working longer by flipping it back and forth.","A slow, unwanted drift creeps the phase a little. A half turn flips the qubit over, so the drift before the flip and the drift after it cancel out.","dynamical decoupling qubit explained"],
+  ["turn","Oracle algorithms","The classic first examples in any course (Deutsch–Jozsa, Bernstein–Vazirani — the inventors' names). An \"oracle\" is a black box hiding an answer; a quantum computer finds it in one try.","A few steps, including half turns, and the answer lands on one single mark, ready to read.","deutsch jozsa algorithm explained"],
+  ["turn","Quantum signal processing (QSVT)","A modern all-purpose method (QSVT stands for \"quantum singular value transformation\") that shapes a program to compute a wide range of functions.","One step, repeated many times, with small adjustments in between — a chain of steps.","quantum signal processing QSVT explained"],
+  ["turn","Quantum walks","The quantum version of a random walk: a walker that spreads along a line or graph much faster than coin-flipping would.","Each step is a quarter-turn or half-turn \"coin\" and then a shift to the next site — stepping is a turn. The walker spreads twice as far as a coin-flip walk.","quantum walk explained"],
+  ["turn","Solovay–Kitaev (gate words)","A theorem (by Solovay and Kitaev) that any rotation can be built, as closely as you like, from only two fixed gates, H and T.","A word in H and T is a chain of quarter, half and eighth turns, walking closer and closer to the target spot. Chains of steps are turns.","solovay kitaev theorem explained"],
+  ["turn","Measurement-based computing","Run a program by measuring, one qubit at a time, a big pre-linked \"cluster\" of qubits — no gates after setup.","Each measurement picks a spot and reads it; the leftover fix-up is a half turn, like in teleportation. The stepping is what makes it compute.","measurement based quantum computing explained"],
+  // ONE FROM 2025 — not in the courses yet, and still one of the three moves
+  ["turn","W-state measurement (2025)","A 2025 experiment (Park, Hofmann, Okamoto and Takeuchi) read out, for the first time, which of the three \"W states\" three photons were in — the three-qubit cousin of the Bell measurement. The three states are told apart by how they respond to shuffling the qubits round in a circle.","Shuffling three qubits round is a third of a turn, so each W state is one corner of a triangle on the ring (marks 0, 20 and 40). The detector counts are added up and land on that corner — a turn, read with the ring's check digits.","entangled measurement W states photons 2025"]
+];
+const MOVE = {set:"Setting",fold:"Fold",turn:"Turn"};
+const yt = q => 'https://www.youtube.com/results?search_query='+encodeURIComponent(q);
+const toolsEl = document.getElementById('tools'), countEl = document.getElementById('count');
+TOOLS.forEach(([m,name,what,why,q],i)=>{
+  const d=document.createElement('div');
+  d.className='tool '+m; d.dataset.move=m;
+  d.innerHTML=`<span class="idx">${String(i+1).padStart(2,'0')}/41</span><div class="movetag">${MOVE[m]}</div><h4>${name}</h4>
+    <p class="does">${what}</p>
+    <p class="why"><b>How it's a ${MOVE[m]}:</b> ${why}</p>
+    <a class="vlink" href="${yt(q)}" target="_blank" rel="noopener">watch an explainer</a>`;
+  toolsEl.appendChild(d);
+});
+function applyFilter(f){
+  let shown=0;
+  document.querySelectorAll('.tool').forEach(t=>{const ok=(f==='all'||t.dataset.move===f);t.classList.toggle('hidden',!ok);if(ok)shown++;});
+  countEl.textContent='showing '+shown+' of 41';
+}
+document.querySelectorAll('#filter button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#filter button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); applyFilter(b.dataset.f);
+}));
+applyFilter('all');
+
+/* ============================ svg helpers ============================ */
+const SVGNS="http://www.w3.org/2000/svg";
+function el(tag,attrs){const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+// colours for the dark "screen" panels
+const C={set:"#4D8DFF",fold:"#FFC20E",turn:"#FF4B3E",green:"#33e08a",blue:"#ffffff",ink:"#f2f4f8",
+         mut:"#aab4c8",ring:"#FF4B3E",line:"#25324a",dim:"#4a5a78"};
+const rad=d=>d*Math.PI/180;
+
+/* ---- the sixty-ring digit wheel (static) ---- */
+const FIB60=[0,1,1,2,3,5,8,3,1,4,5,9,4,3,7,0,7,7,4,1,5,6,1,7,8,5,3,8,1,9,0,9,9,8,7,5,2,7,9,6,5,1,6,7,3,0,3,3,6,9,5,4,9,3,2,5,7,2,9,1];
+(function buildWheel(){
+  const svg=document.getElementById('digitwheel'); if(!svg)return;
+  const cx=220,cy=220,R=180,Rt=196,Rd=158;
+  svg.appendChild(el('circle',{cx,cy,r:R,fill:'none',stroke:C.ring,'stroke-width':2}));
+  const cardinals=new Set([0,15,30,45]);
+  for(let i=0;i<60;i++){
+    const a=rad(180 + i*6);           // 0 at 9 o'clock, clockwise (image coords)
+    const dx=cx+Rd*Math.cos(a), dy=cy+Rd*Math.sin(a);
+    const card=cardinals.has(i);
+    svg.appendChild(el('circle',{cx:cx+R*Math.cos(a),cy:cy+R*Math.sin(a),r:card?4:2.4,
+      fill:card?C.green:C.ring}));
+    const t=el('text',{x:dx,y:dy,fill:card?C.green:C.ink,'font-family':'monospace',
+      'font-size':card?15:14,'font-weight':'bold','text-anchor':'middle','dominant-baseline':'central'});
+    t.textContent=FIB60[i]; svg.appendChild(t);
+    if(i%5===0){ // small position label ring outside
+      const px=cx+(Rt+16)*Math.cos(a), py=cy+(Rt+16)*Math.sin(a);
+      const p=el('text',{x:px,y:py,fill:C.mut,'font-family':'monospace','font-size':11,
+        'text-anchor':'middle','dominant-baseline':'central'}); p.textContent=i; svg.appendChild(p);
+    }
+  }
+  const mid=el('text',{x:cx,y:cy-8,fill:C.mut,'font-family':'monospace','font-size':13,'text-anchor':'middle'});
+  mid.textContent='the sixty-ring'; svg.appendChild(mid);
+  const mid2=el('text',{x:cx,y:cy+12,fill:C.mut,'font-family':'monospace','font-size':11,'text-anchor':'middle'});
+  mid2.textContent='Fibonacci last digits'; svg.appendChild(mid2);
+})();
+
+/* ============================ live demos ============================ */
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function makeSetting(){
+  const svg=document.getElementById('setdemo'); if(!svg)return null;
+  const g={};
+  g.rl=el('circle',{fill:'none',stroke:C.set,'stroke-width':2.5}); svg.appendChild(g.rl);
+  g.rr=el('circle',{fill:'none',stroke:C.set,'stroke-width':2.5}); svg.appendChild(g.rr);
+  g.cos=el('line',{stroke:C.fold,'stroke-width':6,'stroke-linecap':'round'}); svg.appendChild(g.cos);
+  g.sin=el('line',{stroke:C.blue,'stroke-width':6,'stroke-linecap':'round'}); svg.appendChild(g.sin);
+  g.cl=el('circle',{r:4,fill:C.set}); svg.appendChild(g.cl);
+  g.cr=el('circle',{r:4,fill:C.set}); svg.appendChild(g.cr);
+  g.x1=el('circle',{r:4.5,fill:C.ink}); svg.appendChild(g.x1);
+  g.x2=el('circle',{r:4.5,fill:C.ink}); svg.appendChild(g.x2);
+  // fixed legend (top-left) — never moves into the sliding geometry
+  svg.appendChild(el('rect',{x:16,y:16,width:16,height:6,fill:C.fold,rx:2}));
+  svg.appendChild(el('text',{x:38,y:23,fill:C.fold,'font-family':'monospace','font-size':12,'font-weight':'bold'})).textContent='across';
+  svg.appendChild(el('rect',{x:20,y:34,width:6,height:16,fill:C.blue,rx:2}));
+  svg.appendChild(el('text',{x:38,y:47,fill:C.blue,'font-family':'monospace','font-size':12,'font-weight':'bold'})).textContent='up';
+  g.th=el('text',{x:230,y:24,fill:C.ink,'font-family':'monospace','font-size':15,'font-weight':'bold','text-anchor':'middle'});
+  svg.appendChild(g.th);
+  g.rd=el('text',{x:230,y:255,fill:C.mut,'font-family':'monospace','font-size':13,'text-anchor':'middle'});
+  svg.appendChild(g.rd);
+  return g;
+}
+function drawSetting(g,t){
+  if(!g)return;
+  const r=60,x0=150,cy=125;                          // x0: the first ring's centre, which never moves
+  const theta=97.5+62.5*Math.sin(t*0.55);           // 35°..160°
+  const th=rad(theta), half=r*Math.cos(th/2), ey=r*Math.sin(th/2);
+  const lx=x0, rx=x0+2*half, cx=x0+half;            // the second ring slides 2·cos(θ/2) along the line; the crossings sit midway
+  g.rl.setAttribute('cx',lx); g.rl.setAttribute('cy',cy); g.rl.setAttribute('r',r);
+  g.rr.setAttribute('cx',rx); g.rr.setAttribute('cy',cy); g.rr.setAttribute('r',r);
+  g.cos.setAttribute('x1',lx); g.cos.setAttribute('y1',cy); g.cos.setAttribute('x2',rx); g.cos.setAttribute('y2',cy);
+  g.sin.setAttribute('x1',cx); g.sin.setAttribute('y1',cy-ey); g.sin.setAttribute('x2',cx); g.sin.setAttribute('y2',cy+ey);
+  g.cl.setAttribute('cx',lx); g.cl.setAttribute('cy',cy);
+  g.cr.setAttribute('cx',rx); g.cr.setAttribute('cy',cy);
+  g.x1.setAttribute('cx',cx); g.x1.setAttribute('cy',cy-ey);
+  g.x2.setAttribute('cx',cx); g.x2.setAttribute('cy',cy+ey);
+  const ang=Math.round(theta), ah=rad(ang)/2;   // readout uses the angle it shows
+  g.th.textContent='angle = '+ang+'°';
+  g.rd.textContent='reading for 0 = '+Math.cos(ah).toFixed(3)+'   ·   reading for 1 = '+Math.sin(ah).toFixed(3);
+}
+
+function makeFold(){
+  const svg=document.getElementById('folddemo'); if(!svg)return null;
+  const g={cx:150,cy:200,R:120};
+  g.arc=el('path',{d:`M ${g.cx-g.R} ${g.cy} A ${g.R} ${g.R} 0 0 1 ${g.cx+g.R} ${g.cy}`,
+    fill:'none',stroke:C.dim,'stroke-width':2}); svg.appendChild(g.arc);
+  svg.appendChild(el('line',{x1:g.cx-g.R-6,y1:g.cy,x2:g.cx+g.R+6,y2:g.cy,stroke:C.dim,'stroke-width':1}));
+  g.handA=el('line',{stroke:C.fold,'stroke-width':5,'stroke-linecap':'round'}); svg.appendChild(g.handA);
+  g.handB=el('line',{stroke:C.blue,'stroke-width':5,'stroke-linecap':'round'}); svg.appendChild(g.handB);
+  g.dotA=el('circle',{r:6,fill:C.fold}); svg.appendChild(g.dotA);
+  g.dotB=el('circle',{r:6,fill:C.blue}); svg.appendChild(g.dotB);
+  // fixed legend (top-left) — never moves into the swinging hands
+  svg.appendChild(el('rect',{x:16,y:16,width:16,height:6,fill:C.fold,rx:2}));
+  svg.appendChild(el('text',{x:38,y:23,fill:C.fold,'font-family':'monospace','font-size':11.5,'font-weight':'bold'})).textContent='the angle';
+  svg.appendChild(el('rect',{x:16,y:34,width:16,height:6,fill:C.blue,rx:2}));
+  svg.appendChild(el('text',{x:38,y:41,fill:C.blue,'font-family':'monospace','font-size':11.5,'font-weight':'bold'})).textContent='double the angle';
+  g.hub=el('circle',{cx:g.cx,cy:g.cy,r:4,fill:C.ink}); svg.appendChild(g.hub);
+  // two equal bars on the right
+  g.bx1=338; g.bx2=416; g.by=210; g.bh=150;
+  g.bar1=el('rect',{x:g.bx1-15,width:30,fill:C.fold,rx:3}); svg.appendChild(g.bar1);
+  g.bar2=el('rect',{x:g.bx2-15,width:30,fill:C.blue,rx:3}); svg.appendChild(g.bar2);
+  svg.appendChild(el('text',{x:g.bx1,y:230,fill:C.fold,'font-family':'monospace','font-size':11,'text-anchor':'middle'})).textContent='squared';
+  svg.appendChild(el('text',{x:g.bx2,y:230,fill:C.blue,'font-family':'monospace','font-size':11,'text-anchor':'middle'})).textContent='at 2× angle';
+  g.eq=el('text',{x:(g.bx1+g.bx2)/2,y:120,fill:C.ink,'font-family':'monospace','font-size':18,'font-weight':'bold','text-anchor':'middle'});
+  g.eq.textContent='='; svg.appendChild(g.eq);
+  g.th=el('text',{x:200,y:258,fill:C.ink,'font-family':'monospace','font-size':12,'font-weight':'bold','text-anchor':'middle'});
+  svg.appendChild(g.th);
+  return g;
+}
+function drawFold(g,t){
+  if(!g)return;
+  const theta=47.5+37.5*Math.sin(t*0.5);            // 10°..85°
+  const aA=rad(theta), aB=rad(2*theta);             // elevation from the right, into the upper half
+  const R=g.R;
+  const ax=g.cx+R*Math.cos(aA), ay=g.cy-R*Math.sin(aA);
+  const bx=g.cx+R*Math.cos(aB), by=g.cy-R*Math.sin(aB);
+  g.handA.setAttribute('x1',g.cx); g.handA.setAttribute('y1',g.cy); g.handA.setAttribute('x2',ax); g.handA.setAttribute('y2',ay);
+  g.handB.setAttribute('x1',g.cx); g.handB.setAttribute('y1',g.cy); g.handB.setAttribute('x2',bx); g.handB.setAttribute('y2',by);
+  g.dotA.setAttribute('cx',ax); g.dotA.setAttribute('cy',ay);
+  g.dotB.setAttribute('cx',bx); g.dotB.setAttribute('cy',by);
+  const val=(1+Math.cos(rad(theta)))/2;             // = cos^2(theta/2)
+  g.bar1.setAttribute('height',g.bh*val); g.bar1.setAttribute('y',g.by-g.bh*val);
+  g.bar2.setAttribute('height',g.bh*val); g.bar2.setAttribute('y',g.by-g.bh*val);
+  // readout: round the angle first, then show numbers that multiply out exactly on a calculator
+  const ang=Math.round(theta), rd=Math.cos(rad(ang)/2).toFixed(3), sq=(+rd*+rd).toFixed(3);
+  g.th.textContent='angle '+ang+'°:  '+rd+' × '+rd+' = '+sq;
+}
+
+function makeTurn(){
+  const svg=document.getElementById('turndemo'); if(!svg)return null;
+  const g={cx:160,cy:130,R:96,ar:64,a0:-144};   // start at mark 6 (digit 8), same layout as the big ring
+  svg.appendChild(el('circle',{cx:g.cx,cy:g.cy,r:g.R,fill:'none',stroke:C.ring,'stroke-width':2.5}));
+  for(let i=0;i<60;i++){const a=rad(180+i*6);svg.appendChild(el('circle',
+    {cx:g.cx+g.R*Math.cos(a),cy:g.cy+g.R*Math.sin(a),r:i%15?1.4:2.6,fill:i%15?C.ring:C.green,opacity:i%15?.55:1}));}
+  svg.appendChild(el('circle',{cx:g.cx,cy:g.cy,r:4,fill:'#c9a7d8'}));
+  // static start radius (green)
+  const sx=g.cx+g.R*Math.cos(rad(g.a0)), sy=g.cy+g.R*Math.sin(rad(g.a0));
+  svg.appendChild(el('line',{x1:g.cx,y1:g.cy,x2:sx,y2:sy,stroke:C.green,'stroke-width':6,'stroke-linecap':'round'}));
+  svg.appendChild(el('circle',{cx:sx,cy:sy,r:7,fill:C.green}));
+  svg.appendChild(el('text',{x:g.cx+(g.R+19)*Math.cos(rad(g.a0)),y:g.cy+(g.R+19)*Math.sin(rad(g.a0)),fill:C.green,'font-family':'monospace','font-size':15,'font-weight':'bold','text-anchor':'middle','dominant-baseline':'central'})).textContent='8';   // just outside the ring, clear of the moving marker
+  // moving radius (blue)
+  g.mov=el('line',{stroke:C.set,'stroke-width':6,'stroke-linecap':'round'}); svg.appendChild(g.mov);
+  g.movdot=el('circle',{r:7,fill:C.set}); svg.appendChild(g.movdot);
+  g.movtxt=el('text',{fill:C.set,'font-family':'monospace','font-size':15,'font-weight':'bold','text-anchor':'middle'});
+  svg.appendChild(g.movtxt);
+  g.arc=el('path',{fill:'none',stroke:C.turn,'stroke-width':4.5,'stroke-linecap':'round'}); svg.appendChild(g.arc);
+  g.head=el('polygon',{fill:C.turn}); svg.appendChild(g.head);
+  g.mul=el('text',{x:g.cx,y:g.cy+g.R+24,fill:C.turn,'font-family':'monospace','font-size':13,'font-weight':'bold','text-anchor':'middle'});
+  svg.appendChild(g.mul);
+  return g;
+}
+function easeInOut(x){return x<0.5?2*x*x:1-Math.pow(-2*x+2,2)/2;}
+function drawTurn(g,t){
+  if(!g)return;
+  const P=4.4, ph=(t%P)/P;
+  const prog=easeInOut(Math.min(ph/0.5,1));      // 0..1 over first half
+  const rot=90*prog;                             // quarter turn
+  const a1=rad(g.a0+rot);
+  const mx=g.cx+g.R*Math.cos(a1), my=g.cy+g.R*Math.sin(a1);
+  g.mov.setAttribute('x1',g.cx); g.mov.setAttribute('y1',g.cy); g.mov.setAttribute('x2',mx); g.mov.setAttribute('y2',my);
+  g.movdot.setAttribute('cx',mx); g.movdot.setAttribute('cy',my);
+  // arc from a0 to a1 (concentric, clockwise = concave toward centre)
+  const a0=rad(g.a0), r=g.ar;
+  const x0=g.cx+r*Math.cos(a0), y0=g.cy+r*Math.sin(a0);
+  const x1=g.cx+r*Math.cos(a1), y1=g.cy+r*Math.sin(a1);
+  if(rot>4){
+    g.arc.setAttribute('d',`M ${x0.toFixed(1)} ${y0.toFixed(1)} A ${r} ${r} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`);
+    const tx=-Math.sin(a1),ty=Math.cos(a1), nx=Math.cos(a1),ny=Math.sin(a1), L=11,W=7;
+    g.head.setAttribute('points',
+      `${(x1+tx*L).toFixed(1)},${(y1+ty*L).toFixed(1)} ${(x1+nx*W).toFixed(1)},${(y1+ny*W).toFixed(1)} ${(x1-nx*W).toFixed(1)},${(y1-ny*W).toFixed(1)}`);
+    g.arc.setAttribute('opacity',1); g.head.setAttribute('opacity',1);
+  } else { g.arc.setAttribute('opacity',0); g.head.setAttribute('opacity',0); }
+  const done = ph>=0.5;
+  g.movtxt.textContent = done ? '6' : '';
+  g.movtxt.setAttribute('x',mx+2); g.movtxt.setAttribute('y',my+ (my>g.cy?18:-12));
+  g.mul.textContent = done ? '8 × 7 = 56 → 6   ·   quarter turn' : 'a quarter turn = 15 marks = × 7';
+  g.mul.setAttribute('opacity', done?1:0.75);
+}
+
+/* ---- hero: the two sliding rings, each with its sixty marks ---- */
+function makeHero(){
+  const svg=document.getElementById('heroart'); if(!svg)return null;
+  const g={r:92,cx:135,cy:200};                      // cx: the first ring's centre, which never moves
+  svg.appendChild(el('circle',{cx:200,cy:200,r:186,fill:'none',stroke:C.line,'stroke-width':1.5,'stroke-dasharray':'2 6'}));
+  const ring=(col)=>{const G=el('g',{});G.appendChild(el('circle',{cx:0,cy:0,r:g.r,fill:'none',stroke:col,'stroke-width':3.5}));
+    for(let i=0;i<60;i++){const a=rad(180+i*6);G.appendChild(el('circle',{cx:(g.r+9)*Math.cos(a),cy:(g.r+9)*Math.sin(a),
+      r:i%15?1.5:3,fill:i%15?col:C.green,opacity:i%15?.6:1}));}
+    svg.appendChild(G);return G;};
+  g.L=ring(C.set); g.R=ring(C.turn);
+  g.cos=el('line',{stroke:C.fold,'stroke-width':7,'stroke-linecap':'round'}); svg.appendChild(g.cos);
+  g.sin=el('line',{stroke:C.blue,'stroke-width':7,'stroke-linecap':'round'}); svg.appendChild(g.sin);
+  g.cl=el('circle',{r:6,fill:C.fold}); svg.appendChild(g.cl);
+  g.cr=el('circle',{r:6,fill:C.fold}); svg.appendChild(g.cr);
+  g.x1=el('circle',{r:7,fill:C.blue}); svg.appendChild(g.x1);
+  g.x2=el('circle',{r:7,fill:C.blue}); svg.appendChild(g.x2);
+  return g;
+}
+function drawHero(g,t){
+  if(!g)return;
+  const theta=115+35*Math.sin(t*0.4), h=rad(theta)/2;   // 80°..150°
+  const half=g.r*Math.cos(h), ey=g.r*Math.sin(h), lx=g.cx, rx=g.cx+2*half, cx=g.cx+half;
+  g.L.setAttribute('transform',`translate(${lx.toFixed(2)} ${g.cy})`);
+  g.R.setAttribute('transform',`translate(${rx.toFixed(2)} ${g.cy})`);
+  g.cos.setAttribute('x1',lx); g.cos.setAttribute('y1',g.cy); g.cos.setAttribute('x2',rx); g.cos.setAttribute('y2',g.cy);
+  g.sin.setAttribute('x1',cx); g.sin.setAttribute('y1',g.cy-ey); g.sin.setAttribute('x2',cx); g.sin.setAttribute('y2',g.cy+ey);
+  g.cl.setAttribute('cx',lx); g.cl.setAttribute('cy',g.cy); g.cr.setAttribute('cx',rx); g.cr.setAttribute('cy',g.cy);
+  g.x1.setAttribute('cx',cx); g.x1.setAttribute('cy',g.cy-ey); g.x2.setAttribute('cx',cx); g.x2.setAttribute('cy',g.cy+ey);
+}
+
+/* ---- nav: highlight the section you're in, and fill the progress bar ---- */
+(function(){
+  const links=[...document.querySelectorAll('nav.toc .links a')], bar=document.getElementById('progress');
+  const byId=Object.fromEntries(links.map(a=>[a.getAttribute('href').slice(1),a]));
+  if('IntersectionObserver' in window){
+    const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){
+      links.forEach(a=>a.classList.remove('active')); const a=byId[e.target.id];
+      if(a){a.classList.add('active'); const L=a.parentElement; L.scrollLeft=a.offsetLeft-L.clientWidth/2+a.clientWidth/2;} }}),
+      {rootMargin:'-45% 0px -50% 0px'});
+    Object.keys(byId).forEach(id=>{const sct=document.getElementById(id); if(sct)io.observe(sct);});
+  }
+  let ticking=false;
+  const upd=()=>{const h=document.documentElement, max=h.scrollHeight-h.clientHeight;
+    if(bar)bar.style.transform='scaleX('+(max>0?Math.min(1,h.scrollTop/max):0)+')'; ticking=false;};
+  addEventListener('scroll',()=>{ if(!ticking){ticking=true;requestAnimationFrame(upd);} },{passive:true}); upd();
+})();
+
+/* ---- run everything from one clock ---- */
+const setG=makeSetting(), foldG=makeFold(), turnG=makeTurn(), heroG=makeHero();
+function paint(t){ drawSetting(setG,t); drawFold(foldG,t); drawTurn(turnG,t); drawHero(heroG,t); }
+// a clear opening pose, also the still frame for hidden tabs / reduced motion
+drawSetting(setG,1.0); drawFold(foldG,1.28); drawTurn(turnG,2.6); drawHero(heroG,1.0);
+let raf=null, base=performance.now();
+function frame(now){ paint((now-base)/1000 + 1.0); if(!RM && !document.hidden) raf=requestAnimationFrame(frame); else raf=null; }
+if(!RM) raf=requestAnimationFrame(frame);
+document.addEventListener('visibilitychange',()=>{
+  if(RM) return;
+  if(document.hidden){ if(raf){cancelAnimationFrame(raf); raf=null;} }
+  else if(!raf){ base=performance.now(); raf=requestAnimationFrame(frame); }
+});
+</script>
+</body>
+</html>
